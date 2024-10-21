@@ -32,11 +32,26 @@ export async function POST(request: Request) {
     // Parse the request body as JSON
     const body = await request.json();
 
+    // Check if an alumni entry with the same email already exists
+    const existingAlumni = await Alumni.findOne({ email: body.email });
+    if (existingAlumni) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Sorry!, You have submitted your info already",
+        },
+        { status: 400 }
+      );
+    }
+
     // Create a new Alumni entry in the database
     const alumni = await Alumni.create(body);
 
     // Return a successful response
-    return NextResponse.json({ success: true, data: alumni }, { status: 201 });
+    return NextResponse.json(
+      { success: true, message: "Form submitted successfully!", data: alumni },
+      { status: 201 }
+    );
   } catch (error) {
     // Handle errors and return a 400 status response with the error message
     return NextResponse.json({ success: false, error }, { status: 400 });

@@ -43,7 +43,7 @@ export default function FeedbackPage() {
 
     // Redirect after 15 seconds
     const redirectTimer = setTimeout(() => {
-      localStorage.clear();
+      // localStorage.clear();
       router.replace("/"); // Redirect to home page
     }, 15000);
 

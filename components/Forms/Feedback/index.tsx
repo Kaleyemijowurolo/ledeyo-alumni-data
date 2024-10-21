@@ -84,18 +84,21 @@ export default function Feedback() {
       });
 
       if (response.ok) {
-        toast.success("Form submitted successfully!");
+        const responseData = await response.json(); // Extract response data
+        toast.success(responseData.message || "Form submitted successfully!"); // Use the message from the response
+
+        // toast.success("Form submitted successfully!");
         console.log(response);
         router.replace("/form/thankyou");
         setIsLoading(true);
       } else {
-        toast.error("Form submission failed.");
+        const errorData = await response.json(); // Extract error data
+        toast.error(errorData.message || "Form submission failed."); // Use the error message from the response
+        console.log(response);
       }
     } catch (error) {
       setIsLoading(false);
-
-      console.log(error);
-      alert("An error occurred");
+      console.log(error, "error");
     }
   };
 
