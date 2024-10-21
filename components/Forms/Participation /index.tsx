@@ -83,6 +83,7 @@ const formSchema = z.object({
   commissioning: z.string(),
   state: z.string(),
   country: z.string(),
+  contactsAttended: z.string(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -98,6 +99,7 @@ export default function Participation() {
       city: "",
       commissioning: "",
       state: "",
+      contactsAttended: "",
       country: "",
     },
   });
@@ -125,8 +127,25 @@ export default function Participation() {
     }
   };
 
-  // Define an array of form fields
-  const formFields = [
+  // Define a type for the form field names
+  type FormFieldNames =
+    | "ledeyoSet"
+    | "commissioning"
+    | "workshops"
+    | "nationality"
+    | "country"
+    | "state"
+    | "city"
+    | "contactsAttended";
+
+  // Update the formFields array to use the new type
+  const formFields: {
+    name: FormFieldNames;
+    label: string;
+    type: string;
+    options?: string[] | number[];
+    placeholder?: string;
+  }[] = [
     {
       name: "ledeyoSet",
       label: "Which LEDEYO Set do you belong to",

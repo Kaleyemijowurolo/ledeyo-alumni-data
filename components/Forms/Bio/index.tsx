@@ -68,7 +68,13 @@ export default function Bio() {
     }
   };
   // Define an array of form fields
-  const formFields = [
+  const formFields: {
+    name: "firstName" | "middleName" | "surname" | "gender" | "phone" | "email";
+    label: string;
+    placeholder: string;
+    type?: string;
+    options?: string[];
+  }[] = [
     {
       name: "firstName",
       label: "First Name",

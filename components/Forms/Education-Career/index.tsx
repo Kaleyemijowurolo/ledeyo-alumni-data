@@ -23,13 +23,21 @@ const formSchema = z.object({
   occupation: z.string(),
   crossCareerPath: z.string(),
   callMinistry: z.string(),
-  ministryCalling: z.string(),
+  ministryCalling: z.string().optional(),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function EducationCareer() {
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    defaultValues: {
+      education: "",
+      discipline: "",
+      occupation: "",
+      crossCareerPath: "",
+      callMinistry: "",
+    },
   });
 
   const router = useRouter();
@@ -50,12 +58,45 @@ export default function EducationCareer() {
     }
   };
 
-  const onSubmit = () => {
-    router.push("/form/feedback");
-  };
+  // const onSubmit = () => {
+  //   router.push("/form/feedback");
+  // };
 
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        alert("Form submitted successfully!");
+        console.log(response);
+        router.push("/form/feedback");
+      } else {
+        alert("Form submission failed.");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred");
+    }
+  };
   // Define an array of form fields
-  const formFields = [
+  const formFields: {
+    name:
+      | "education"
+      | "discipline"
+      | "occupation"
+      | "crossCareerPath"
+      | "callMinistry";
+    label: string;
+    placeholder?: string;
+    type?: string;
+    options?: string[];
+  }[] = [
     {
       name: "education",
       label: "Highest Level of Education",
@@ -103,7 +144,7 @@ export default function EducationCareer() {
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="">
           <div className="grid md:grid-cols-2 gap-3 items-start">
             {formFields.map((field) => (
               <FormField
@@ -142,16 +183,15 @@ export default function EducationCareer() {
                               />
                             </div>
                           )}
-                          {field.name === "ministryCalling" &&
-                            ministryCalling && (
-                              <div className="mt-2">
-                                <Input
-                                  placeholder="please mention the calling"
-                                  {...form.register(`ministryCalling` as never)}
-                                  type="text"
-                                />
-                              </div>
-                            )}
+                          {field.name === "callMinistry" && ministryCalling && (
+                            <div className="mt-2">
+                              <Input
+                                placeholder="please mention the calling"
+                                {...form.register(`ministryCalling` as never)}
+                                type="text"
+                              />
+                            </div>
+                          )}
                           {field.name === "crossCareerPath" &&
                             crossCareerPath && (
                               <div className="mt-2">
