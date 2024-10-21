@@ -28,21 +28,45 @@ const formSchema = z.object({
   email: z.string().email(),
 });
 
-export default function Bio() {
-  // ...
+type FormValues = z.infer<typeof formSchema>;
 
+export default function Bio() {
   const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    defaultValues: {
+      firstName: "",
+      middleName: "",
+      surname: "",
+      gender: "",
+      phone: "",
+      email: "",
+    },
   });
 
-  const onSubmit = () => {
-    // console.log(data);
-    router.push("/form/participation");
-  };
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
+      if (response.ok) {
+        alert("Form submitted successfully!");
+        console.log(response);
+        router.push("/form/participation");
+      } else {
+        alert("Form submission failed.");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred");
+    }
+  };
   // Define an array of form fields
   const formFields = [
     {
@@ -80,7 +104,7 @@ export default function Bio() {
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="">
           <div className="grid md:grid-cols-2 gap-3 items-start">
             {formFields.map((field) => (
               <FormField
@@ -89,13 +113,13 @@ export default function Bio() {
                 control={form.control}
                 render={({ field: formField }) => (
                   <FormItem>
-                    <FormLabel>{field.label}</FormLabel>
+                    <FormLabel className="text-sm">{field.label}</FormLabel>
                     <FormControl>
                       {field.type === "select" ? (
                         <div>
                           <select
                             {...formField}
-                            className="border w-full rounded-md py-2"
+                            className="border w-full rounded-md py-2 text-xs md:text-sm"
                           >
                             <option value="">Select </option>
                             {field?.options?.map((option) => (
@@ -113,9 +137,7 @@ export default function Bio() {
                         />
                       )}
                     </FormControl>
-                    {/* <FormDescription>
-                    This is your public display name.
-                  </FormDescription> */}
+
                     <FormMessage />
                   </FormItem>
                 )}

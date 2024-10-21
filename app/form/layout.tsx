@@ -21,18 +21,16 @@ Readonly<{
   // session: Session | null;
 }>) {
   return (
-    <html lang="en">
-      <body
-        style={{
-          backgroundImage: 'url("/bg-line2.png")',
-          backgroundSize: "cover", // Optional: to cover the entire background
-          backgroundPosition: "center", // Optional: to center the image
-          backgroundRepeat: "no-repeat",
-        }}
-        className={`${inter.className} ${dm_sans.variable}`}
-      >
-        {children}
-      </body>
-    </html>
+    <div
+      style={{
+        backgroundImage: 'url("/bg-line2.png")',
+        backgroundSize: "cover", // Optional: to cover the entire background
+        backgroundPosition: "center", // Optional: to center the image
+        backgroundRepeat: "no-repeat",
+      }}
+      className={`${inter.className} ${dm_sans.variable}`}
+    >
+      {children}
+    </div>
   );
 }

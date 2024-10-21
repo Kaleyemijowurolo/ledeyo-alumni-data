@@ -91,12 +91,7 @@ export default function EducationCareer() {
       type: "select",
       options: ["Yes", "No"],
     },
-    // {
-    //   name: "crossCareerPath",
-    //   label: "Cross Career Path",
-    //   placeholder: "Enter your Cross Career Path",
-    //   type: "text",
-    // },
+
     {
       name: "callMinistry",
       label: "Do you sense the call of God outside your career path?",
@@ -117,7 +112,7 @@ export default function EducationCareer() {
                 control={form.control}
                 render={({ field: formField }) => (
                   <FormItem>
-                    <FormLabel>{field.label}</FormLabel>
+                    <FormLabel className="text-sm">{field.label}</FormLabel>
                     <FormControl>
                       {field.type === "select" ? (
                         <div>
@@ -127,11 +122,11 @@ export default function EducationCareer() {
                               formField.onChange(e);
                               handleEducationChange(e.target.value, field.name);
                             }}
-                            className="border w-full rounded-md py-2"
+                            className="border w-full rounded-md py-2 text-xs md:text-sm"
                           >
                             <option value="">Select </option>
                             {field?.options?.map((option) => (
-                              <option key={option} value={option}>
+                              <option key={option} value={option} className="">
                                 {option}
                               </option>
                             ))}
@@ -176,9 +171,7 @@ export default function EducationCareer() {
                         />
                       )}
                     </FormControl>
-                    {/* <FormDescription>
-                    This is your public display name.
-                  </FormDescription> */}
+
                     <FormMessage />
                   </FormItem>
                 )}

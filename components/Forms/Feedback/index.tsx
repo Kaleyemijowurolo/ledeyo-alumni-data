@@ -63,7 +63,7 @@ export default function Feedback() {
                 control={form.control}
                 render={({ field: formField }) => (
                   <FormItem>
-                    <FormLabel>{field.label}</FormLabel>
+                    <FormLabel className="text-sm">{field.label}</FormLabel>
                     <FormControl>
                       <Input
                         placeholder={field.placeholder}

@@ -1,7 +1,8 @@
 "use client";
-// import Link from "next/link";
 import React from "react";
-// import { useState, ChangeEvent, FormEvent } from "react";
+import // useState, ChangeEvent,
+// FormEvent,
+"react";
 
 // interface FormData {
 //   firstName: string;
@@ -57,79 +58,6 @@ import React from "react";
 //     setFormData({ ...formData, [e.target.name]: e.target.value });
 //   };
 
-//   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     try {
-//       const response = await fetch("/api/submit", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(formData),
-//       });
-
-//       if (response.ok) {
-//         alert("Form submitted successfully!");
-//       } else {
-//         alert("Form submission failed.");
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       alert("An error occurred");
-//     }
-//   };
-
-//   return (
-//     <form onSubmit={handleSubmit}>
-//       <h1>LEDEYO Global Alumni Family</h1>
-//       <label>First Name</label>
-//       <input
-//         type="text"
-//         name="firstName"
-//         value={formData.firstName}
-//         onChange={handleChange}
-//         required
-//       />
-
-//       <label>Surname</label>
-//       <input
-//         type="text"
-//         name="surname"
-//         value={formData.surname}
-//         onChange={handleChange}
-//         required
-//       />
-
-//       <label>Gender</label>
-//       <select
-//         name="gender"
-//         value={formData.gender}
-//         onChange={handleChange}
-//         required
-//       >
-//         <option value="">Select Gender</option>
-//         <option value="Male">Male</option>
-//         <option value="Female">Female</option>
-//       </select>
-
-//       <label>Email</label>
-//       <input
-//         type="email"
-//         name="email"
-//         value={formData.email}
-//         onChange={handleChange}
-//         required
-//       />
-
-//       {/* You can continue adding the rest of the form fields similarly */}
-
-//       <button type="submit">Submit</button>
-//     </form>
-//   );
-// }
-
-// "use client"
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -157,20 +85,47 @@ const formSchema = z.object({
   country: z.string(),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 export default function Participation() {
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    defaultValues: {
+      ledeyoSet: "",
+      workshops: "",
+      nationality: "",
+      city: "",
+      commissioning: "",
+      state: "",
+      country: "",
+    },
   });
 
-  const onSubmit = () => {
-    router.push("/form/education-career");
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        alert("Form submitted successfully!");
+        console.log(response);
+        router.push("/form/education-career");
+      } else {
+        alert("Form submission failed.");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred");
+    }
   };
 
   // Define an array of form fields
-  // ... existing code ...
-
   const formFields = [
     {
       name: "ledeyoSet",
@@ -235,7 +190,7 @@ export default function Participation() {
   return (
     <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="">
           <div className="grid grid-cols-2 gap-3 items-start">
             {formFields.map((field) => (
               <FormField
@@ -244,13 +199,13 @@ export default function Participation() {
                 control={form.control}
                 render={({ field: formField }) => (
                   <FormItem>
-                    <FormLabel>{field.label}</FormLabel>
+                    <FormLabel className="text-sm">{field.label}</FormLabel>
                     <FormControl>
                       {field.type === "select" ? (
                         <div>
                           <select
                             {...formField}
-                            className="border w-full rounded-md py-2"
+                            className="border w-full rounded-md py-2 text-xs md:text-sm"
                           >
                             <option value="">Select </option>
                             {field?.options?.map((option) => (

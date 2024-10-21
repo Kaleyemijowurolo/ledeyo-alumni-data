@@ -10,7 +10,7 @@ export default function FeedbackPage() {
         backgroundPosition: "center", // Optional: to center the image
         backgroundRepeat: "no-repeat",
       }}
-      className="px-2 flex flex-col md:px-24 py-12 h-screen bg-purple-100/10"
+      className="px-2 flex flex-col md:px-24 py-12 h-max md:h-screen bg-cyan-100/10"
     >
       <Breadcrumb pageName="Feedback" />
 

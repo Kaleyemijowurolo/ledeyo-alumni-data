@@ -3,7 +3,7 @@ import Bio from "@/components/Forms/Bio";
 
 export default function BioPage() {
   return (
-    <div className="px-2 flex flex-col md:px-24 py-12 bg-blue-100 h-screen">
+    <div className="px-2 flex flex-col md:px-24 py-12 bg-blue-100 h-max md:h-screen">
       <Breadcrumb pageName="Bio" />
 
       <div className="flex flex-1 justify-center items-center">

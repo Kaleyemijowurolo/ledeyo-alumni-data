@@ -27,29 +27,34 @@ export interface IAlumni extends Document {
 }
 
 const AlumniSchema: Schema = new Schema({
-  firstName: { type: String, required: true },
+  firstName: { type: String },
   middleName: { type: String },
-  surname: { type: String, required: true },
-  gender: { type: String, required: true },
-  phone: { type: String, required: true },
-  email: { type: String, required: true },
-  ledeyoSet: { type: String, required: true },
-  contactsAttended: { type: Number, required: true },
-  commissioning: { type: Boolean, required: true },
-  workshops: [{ type: String }],
-  nationality: { type: String, required: true },
-  country: { type: String, required: true },
-  state: { type: String, required: true },
-  city: { type: String, required: true },
-  education: { type: String, required: true },
-  discipline: { type: String, required: true },
-  occupation: { type: String, required: true },
-  crossCareer: { type: Boolean, required: true },
+  surname: { type: String },
+  gender: { type: String },
+  phone: { type: String },
+  email: { type: String },
+  ledeyoSet: { type: String },
+  contactsAttended: { type: Number },
+  commissioning: { type: Boolean },
+  workshops: { type: String },
+  //   workshops: [{ type: String }],
+  nationality: { type: String },
+  country: { type: String },
+  state: { type: String },
+  city: { type: String },
+  education: { type: String },
+  discipline: { type: String },
+  occupation: { type: String },
+  crossCareer: { type: String },
   crossCareerPath: { type: String },
-  callMinistry: { type: Boolean, required: true },
+  callMinistry: { type: String },
+  //   callMinistry: { type: Boolean, required: true },
   ministryCalling: { type: String },
   expectations: { type: String },
   suggestions: { type: String },
 });
 
-export default mongoose.models.Alumni || model<IAlumni>("Alumni", AlumniSchema);
+// Export the Alumni model, using an existing model if it exists, otherwise create a new one
+// if you want your collection to be named alumniRecords, you can pass that as the third argument:
+export default mongoose.models.Alumni ||
+  model<IAlumni>("Alumni", AlumniSchema, "alumniRecords");
