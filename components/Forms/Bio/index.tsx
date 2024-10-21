@@ -114,7 +114,7 @@ export default function Bio() {
     <div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="">
-          <div className="grid md:grid-cols-2 gap-3 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
             {formFields.map((field) => (
               <FormField
                 key={field.name}
