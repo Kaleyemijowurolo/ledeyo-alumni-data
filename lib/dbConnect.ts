@@ -143,31 +143,20 @@ if (!MONGODB_URI) {
   throw new Error(
     "Please define the MONGODB_URI environment variable inside .env.local"
   );
-} else {
-  console.log(MONGODB_URI, ":Uri");
 }
 
 // Ensure global.mongoose is initialized and cached properly
+
 let cached = (
   global as typeof global & {
-    mongoose: {
-      conn: Mongoose | null;
-      promise: Promise<Mongoose> | null;
-    };
+    mongoose: { conn: Mongoose | null; promise: Promise<Mongoose> | null };
   }
 ).mongoose;
 
 if (!cached) {
-  // Initialize the global object if it doesn't exist
-  //   cached = global.mongoose = { conn: null, promise: null };
   cached = (
-    global as typeof global & {
-      mongoose: {
-        conn: null;
-        promise: null;
-      };
-    }
-  ).mongoose;
+    global as typeof global & { mongoose: { conn: null; promise: null } }
+  ).mongoose = { conn: null, promise: null };
 }
 
 async function dbConnect() {

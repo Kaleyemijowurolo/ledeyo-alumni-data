@@ -46,26 +46,29 @@ export default function Bio() {
   });
 
   const handleSubmit = async (values: FormValues) => {
-    try {
-      const response = await fetch("/api/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+    localStorage.setItem("data", JSON.stringify(values));
+    router.replace("/form/participation");
 
-      if (response.ok) {
-        alert("Form submitted successfully!");
-        console.log(response);
-        router.push("/form/participation");
-      } else {
-        alert("Form submission failed.");
-      }
-    } catch (error) {
-      console.log(error);
-      alert("An error occurred");
-    }
+    // try {
+    //   const response = await fetch("/api/submit", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(values),
+    //   });
+
+    //   if (response.ok) {
+    //     alert("Form submitted successfully!");
+    //     console.log(response);
+    //     router.replace("/form/participation");
+    //   } else {
+    //     alert("Form submission failed.");
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    //   alert("An error occurred");
+    // }
   };
   // Define an array of form fields
   const formFields: {

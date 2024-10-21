@@ -1,26 +1,27 @@
 import mongoose, { Document, Schema, model } from "mongoose";
 
 export interface IAlumni extends Document {
-  firstName: string;
+  firstName?: string;
   middleName?: string;
-  surname: string;
-  gender: string;
-  phone: string;
-  email: string;
-  ledeyoSet: string;
-  contactsAttended: number;
-  commissioning: boolean;
-  workshops: string[];
-  nationality: string;
-  country: string;
-  state: string;
-  city: string;
-  education: string;
-  discipline: string;
-  occupation: string;
-  crossCareer: boolean;
+  surname?: string;
+  gender?: string;
+  phone?: string;
+  email?: string;
+  ledeyoSet?: string;
+  contactsAttended?: string;
+  commissioning?: string;
+  workshops?: string;
+  //   workshops: string[];
+  nationality?: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  education?: string;
+  discipline?: string;
+  occupation?: string;
+  crossCareer?: boolean;
   crossCareerPath?: string;
-  callMinistry: boolean;
+  callMinistry?: boolean;
   ministryCalling?: string;
   expectations?: string;
   suggestions?: string;
@@ -34,8 +35,8 @@ const AlumniSchema: Schema = new Schema({
   phone: { type: String },
   email: { type: String },
   ledeyoSet: { type: String },
-  contactsAttended: { type: Number },
-  commissioning: { type: Boolean },
+  contactsAttended: { type: String },
+  commissioning: { type: String },
   workshops: { type: String },
   //   workshops: [{ type: String }],
   nationality: { type: String },

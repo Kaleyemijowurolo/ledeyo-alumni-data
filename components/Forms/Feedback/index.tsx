@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   expectations: z.string(),
@@ -26,6 +27,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function Feedback() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,27 +37,63 @@ export default function Feedback() {
   });
 
   // const onSubmit = () => {
-  //   router.push("/form/thankyou");
+  //   router.replace("/form/thankyou");
+  // };
+
+  // const handleSubmit = async (values: FormValues) => {
+  //   try {
+  //     const response = await fetch("/api/submit", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(values),
+  //     });
+
+  //     if (response.ok) {
+  //       alert("Form submitted successfully!");
+  //       console.log(response);
+  //       router.replace("/form/thankyou");
+  //     } else {
+  //       alert("Form submission failed.");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     alert("An error occurred");
+  //   }
   // };
 
   const handleSubmit = async (values: FormValues) => {
+    setIsLoading(true);
     try {
+      // Retrieve data from local storage
+      const localStorageData = localStorage.getItem("data"); // Replace "yourKey" with the actual key
+      const additionalData = localStorageData
+        ? JSON.parse(localStorageData)
+        : {};
+
+      // Merge local storage data with form values
+      const combinedValues = { ...values, ...additionalData };
+
       const response = await fetch("/api/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(combinedValues),
       });
 
       if (response.ok) {
-        alert("Form submitted successfully!");
+        toast.success("Form submitted successfully!");
         console.log(response);
-        router.push("/form/thankyou");
+        router.replace("/form/thankyou");
+        setIsLoading(true);
       } else {
-        alert("Form submission failed.");
+        toast.error("Form submission failed.");
       }
     } catch (error) {
+      setIsLoading(false);
+
       console.log(error);
       alert("An error occurred");
     }
@@ -81,6 +119,7 @@ export default function Feedback() {
       label:
         "Any suggestions to improve the LEDEYO Alumni Family's inclusivity and engagement?",
       type: "text",
+      placeholder: "We're open to your opinions",
     },
   ];
 
@@ -113,8 +152,10 @@ export default function Feedback() {
               />
             ))}
           </div>
-          <div className="float-right my-3 border">
-            <Button type="submit">Finish</Button>
+          <div className="float-right my-3 border ">
+            <Button disabled={isLoading} type="submit">
+              {isLoading ? "Submiting..." : "Finish"}
+            </Button>
           </div>
         </form>
       </Form>

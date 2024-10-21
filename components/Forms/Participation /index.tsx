@@ -104,27 +104,41 @@ export default function Participation() {
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
-    try {
-      const response = await fetch("/api/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+  // const handleSubmit = async (values: FormValues) => {
+  // try {
+  //   const response = await fetch("/api/submit", {
+  //     method: "PATCH",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(values),
+  //   });
 
-      if (response.ok) {
-        alert("Form submitted successfully!");
-        console.log(response);
-        router.push("/form/education-career");
-      } else {
-        alert("Form submission failed.");
-      }
-    } catch (error) {
-      console.log(error);
-      alert("An error occurred");
-    }
+  //   if (response.ok) {
+  //     alert("Form submitted successfully!");
+  //     console.log(response);
+  //     router.replace("/form/education-career");
+  //   } else {
+  //     alert("Form submission failed.");
+  //   }
+  // } catch (error) {
+  //   console.log(error);
+  //   alert("An error occurred");
+  // }
+  // };
+
+  const handleSubmit = async (values: FormValues) => {
+    // Retrieve existing data from local storage
+    const existingData = localStorage.getItem("data");
+    const updatedData = existingData ? JSON.parse(existingData) : {};
+
+    // Merge existing data with new values
+    const mergedData = { ...updatedData, ...values };
+
+    // Save the merged data back to local storage
+    localStorage.setItem("data", JSON.stringify(mergedData));
+
+    router.replace("/form/education-career");
   };
 
   // Define a type for the form field names

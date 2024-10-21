@@ -15,7 +15,7 @@ export default function FeedbackPage() {
       <Breadcrumb pageName="Feedback" />
 
       <div className="flex flex-1 justify-center items-center">
-        <div className="w-full md:w-3/5 p-4 sm:p-12.5 xl:p-15 rounded-[10px] border-[0.5px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
+        <div className="w-full md:w-2/5 p-4 sm:p-12.5 xl:p-15 rounded-[10px] border-[0.5px] bg-white shadow-1 dark:bg-gray-dark dark:shadow-card">
           <Feedback />
         </div>
       </div>
