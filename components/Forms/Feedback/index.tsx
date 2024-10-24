@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { decryptData } from "@/lib";
+import { decryptData, encryptionKey, encryptionKeyIV } from "@/lib";
 
 const formSchema = z.object({
   expectations: z.string(),
@@ -69,7 +69,14 @@ export default function Feedback() {
     try {
       // Retrieve data from local storage
       const localStorageData = localStorage.getItem("data"); // Replace "yourKey" with the actual key
-      const decrypt = await decryptData(localStorageData!);
+
+      // Decrypt the existing data
+      if (!localStorageData) return;
+      const decrypt = decryptData(
+        localStorageData,
+        encryptionKey,
+        encryptionKeyIV
+      );
 
       const formData = decrypt ? JSON.parse(decrypt) : {};
 

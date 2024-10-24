@@ -14,7 +14,12 @@ import {
   FormMessage,
   FormControl,
 } from "@/components/ui/form";
-import { decryptData, encryptData } from "@/lib";
+import {
+  decryptData,
+  encryptData,
+  encryptionKey,
+  encryptionKeyIV,
+} from "@/lib";
 
 // Define TypeScript types for Country and State
 interface State {
@@ -70,18 +75,32 @@ export default function Participation() {
     form.setValue("country", event.target.value); // Set the country in the form
   };
 
+  // Handle form submission
   const handleSubmit = async (values: FormValues) => {
+    // Retrieve existing data from localStorage
     const existingData = localStorage.getItem("data");
-    const decrypt = await decryptData(existingData!);
-    const updatedData = existingData ? JSON.parse(decrypt) : {};
+    if (existingData) {
+      // Decrypt the existing data
+      const decrypt = decryptData(existingData, encryptionKey, encryptionKeyIV);
+      console.log(decrypt, "decrypt in participation");
+      // Parse the decrypted data or use an empty object if decryption fails
+      const updatedData = decrypt ? JSON.parse(decrypt) : {};
+      // Merge the existing data with the new form values
+      const mergedData = { ...updatedData, ...values };
 
-    const mergedData = { ...updatedData, ...values };
+      // Convert merged data to a string and encrypt it
+      const encryptValuesString = JSON.stringify(mergedData);
+      const encryptValues = encryptData(
+        encryptValuesString,
+        encryptionKey,
+        encryptionKeyIV
+      );
+      // Store the encrypted data back in localStorage
+      localStorage.setItem("data", encryptValues);
 
-    // localStorage.setItem("data", JSON.stringify(mergedData));
-    const encryptValues = await encryptData(JSON.stringify(mergedData));
-    localStorage.setItem("data", encryptValues);
-
-    router.replace("/form/education-career");
+      // Redirect to the next form
+      router.replace("/form/education-career");
+    }
   };
 
   // Define a type for the form field names

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { encryptData } from "@/lib";
+import { encryptData, encryptionKey, encryptionKeyIV } from "@/lib";
 
 const formSchema = z.object({
   firstName: z.string().min(2, { message: "required" }),
@@ -48,7 +48,12 @@ export default function Bio() {
 
   const handleSubmit = async (values: FormValues) => {
     // Encrypt the form values and store them in local storage
-    const encryptValues = await encryptData(JSON.stringify(values));
+    const encryptValuesString = JSON.stringify(values);
+    const encryptValues = encryptData(
+      encryptValuesString,
+      encryptionKey,
+      encryptionKeyIV
+    );
     localStorage.setItem("data", encryptValues);
     // Redirect to the participation page
     router.replace("/form/participation");

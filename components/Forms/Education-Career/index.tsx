@@ -16,7 +16,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { decryptData, encryptData } from "@/lib";
+import {
+  decryptData,
+  encryptData,
+  encryptionKey,
+  encryptionKeyIV,
+} from "@/lib";
 
 const formSchema = z.object({
   education: z.string().min(2, { message: "required" }),
@@ -87,17 +92,33 @@ export default function EducationCareer() {
   // };
 
   const handleSubmit = async (values: FormValues) => {
+    // Retrieve existing data from localStorage
     const existingData = localStorage.getItem("data");
-    const decrypt = await decryptData(existingData!);
-    const updatedData = existingData ? JSON.parse(decrypt) : {};
+    if (existingData) {
+      // Decrypt the existing data
+      const decrypt = decryptData(existingData, encryptionKey, encryptionKeyIV);
+      console.log(decrypt, "decrypt in participation");
 
-    const mergedData = { ...updatedData, ...values };
+      // Parse the decrypted data or use an empty object if decryption fails
+      const updatedData = decrypt ? JSON.parse(decrypt) : {};
 
-    // localStorage.setItem("data", JSON.stringify(mergedData));
-    const encryptValues = await encryptData(JSON.stringify(mergedData));
-    localStorage.setItem("data", encryptValues);
+      // Merge the existing data with the new form values
+      const mergedData = { ...updatedData, ...values };
 
-    router.replace("/form/feedback");
+      // Encrypt the merged data
+      const encryptValuesString = JSON.stringify(mergedData);
+      const encryptValues = encryptData(
+        encryptValuesString,
+        encryptionKey,
+        encryptionKeyIV
+      );
+
+      // Store the encrypted data back in localStorage
+      localStorage.setItem("data", encryptValues);
+
+      // Redirect to the feedback page
+      router.replace("/form/feedback");
+    }
   };
 
   // Define an array of form fields
