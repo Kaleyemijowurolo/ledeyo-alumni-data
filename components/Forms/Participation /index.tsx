@@ -38,6 +38,7 @@ const formSchema = z.object({
   commissioning: z.string().min(2, { message: "required." }),
   state: z.string().optional(), // Make state optional
   country: z.string().min(1, { message: "required." }),
+  city: z.string().min(1, { message: "required." }),
   contactsAttended: z.string().min(1, { message: "required" }),
 });
 
@@ -60,6 +61,7 @@ export default function Participation() {
       nationality: "",
       commissioning: "",
       state: "",
+      city: "",
       contactsAttended: "",
       country: "",
     },
@@ -111,6 +113,7 @@ export default function Participation() {
     | "nationality"
     | "country"
     | "state"
+    | "city"
     | "contactsAttended";
 
   // Updated formFields array
@@ -122,23 +125,23 @@ export default function Participation() {
     placeholder?: string;
   }[] = [
     {
+      type: "select",
       name: "ledeyoSet",
       label: "Which LEDEYO Set do you belong to",
-      type: "select",
       options: ["Set 1", "Set 2", "Set 3", "Set 4", "Set 5"],
     },
     {
+      type: "select",
+      options: [1, 2],
       name: "contactsAttended",
       label: "How many LEDEYO contacts did you attend?",
       placeholder: "Enter number of Contacts Attended",
-      type: "select",
-      options: [1, 2],
     },
     {
-      name: "commissioning",
-      label: "Did you attend the Commissioning?",
       type: "select",
+      name: "commissioning",
       options: ["Yes", "No"],
+      label: "Did you attend the Commissioning?",
     },
     {
       name: "workshops",
@@ -150,21 +153,24 @@ export default function Participation() {
         "Legal",
         "Youth in Ministry",
         "Business & Finance",
+        "Politics & Governance",
+        "Construction & Engineering",
       ],
     },
     {
+      type: "select",
       name: "nationality",
       label: "Nationality",
-      type: "select",
       options: countries.map((country: Country) => country.name),
     },
     {
       name: "country",
+      type: "select",
       label: "Country of Residence",
       placeholder: "Enter your Country",
-      type: "select",
       options: countries.map((country: Country) => country.name),
     },
+
     // Conditionally render the state field if states are available
     ...(states.length > 0
       ? [
@@ -176,6 +182,12 @@ export default function Participation() {
           },
         ]
       : []),
+    {
+      name: "city",
+      type: "text",
+      label: "City/Town of Residence",
+      placeholder: "Enter your city",
+    },
   ];
 
   return (
