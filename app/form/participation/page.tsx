@@ -4,13 +4,13 @@ import Participation from "@/components/Forms/Participation ";
 export default function ParticipationPage() {
   return (
     <div
-      style={{
-        backgroundImage: 'url("/bg-line2.png")',
-        backgroundSize: "cover", // Optional: to cover the entire background
-        backgroundPosition: "center", // Optional: to center the image
-        backgroundRepeat: "no-repeat",
-      }}
-      className="px-2 flex flex-col md:px-24 py-12 h-max md:h-screen bg-blue-100/10"
+      // style={{
+      //   backgroundImage: 'url("/bg-line2.png")',
+      //   backgroundSize: "cover", // Optional: to cover the entire background
+      //   backgroundPosition: "center", // Optional: to center the image
+      //   backgroundRepeat: "no-repeat",
+      // }}
+      className="px-2 flex flex-col md:px-24 py-12 h-max md:h-screen bg-green-200/30"
     >
       <Breadcrumb pageName="Participation" />
 

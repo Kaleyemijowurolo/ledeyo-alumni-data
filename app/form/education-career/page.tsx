@@ -3,7 +3,7 @@ import EducationCareer from "@/components/Forms/Education-Career";
 
 export default function EducationCareerPage() {
   return (
-    <div className="px-2 flex flex-col md:px-24 py-12 h-max md:h-screen bg-purple-100">
+    <div className="px-2 flex flex-col md:px-24 py-12 h-max md:h-screen bg-purple-600/10">
       <Breadcrumb pageName="Education & Career" />
 
       <div className="flex flex-1 justify-center items-center">
