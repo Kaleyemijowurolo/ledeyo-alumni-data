@@ -47,9 +47,25 @@ type FormValues = z.infer<typeof formSchema>;
 export default function Participation() {
   const router = useRouter();
 
-  const st =
+  // const st =
+  //   typeof window !== "undefined" ? sessionStorage.getItem("countries") : "";
+  // const storedCountries = JSON.parse(st);
+  const storedCountriesString =
     typeof window !== "undefined" ? sessionStorage.getItem("countries") : "";
-  const storedCountries = JSON.parse(st!);
+  let storedCountries: Country[] = [];
+
+  // Check if the stored countries string is not empty
+  if (storedCountriesString) {
+    try {
+      // Attempt to parse the JSON
+      storedCountries = JSON.parse(storedCountriesString);
+    } catch (error) {
+      console.error("Error parsing countries:", error);
+      storedCountries = []; // Fallback to an empty array
+    }
+  } else {
+    console.warn("No countries found in sessionStorage.");
+  }
   const [countries] = useState<Country[]>(storedCountries || []); // Use Country type
   const [states, setStates] = useState<State[]>([]); // Use State type
 
@@ -83,7 +99,11 @@ export default function Participation() {
     const existingData = localStorage.getItem("data");
     if (existingData) {
       // Decrypt the existing data
-      const decrypt = decryptData(existingData, encryptionKey, encryptionKeyIV);
+      const decrypt = await decryptData(
+        existingData,
+        encryptionKey,
+        encryptionKeyIV
+      );
       console.log(decrypt, "decrypt in participation");
       // Parse the decrypted data or use an empty object if decryption fails
       const updatedData = decrypt ? JSON.parse(decrypt) : {};
@@ -92,14 +112,13 @@ export default function Participation() {
 
       // Convert merged data to a string and encrypt it
       const encryptValuesString = JSON.stringify(mergedData);
-      const encryptValues = encryptData(
+      const encryptValues = await encryptData(
         encryptValuesString,
         encryptionKey,
         encryptionKeyIV
       );
       // Store the encrypted data back in localStorage
       localStorage.setItem("data", encryptValues);
-
       // Redirect to the next form
       router.replace("/form/education-career");
     }
