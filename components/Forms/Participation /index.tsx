@@ -147,7 +147,7 @@ export default function Participation() {
       type: "select",
       name: "ledeyoSet",
       label: "Which LEDEYO Set do you belong to",
-      options: ["Set 1", "Set 2", "Set 3", "Set 4", "Set 5"],
+      options: ["Set 1", "Set 2", "Set 3", "Set 4"],
     },
     {
       type: "select",
