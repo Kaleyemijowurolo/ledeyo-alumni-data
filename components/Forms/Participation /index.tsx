@@ -14,6 +14,7 @@ import {
   FormMessage,
   FormControl,
 } from "@/components/ui/form";
+import { decryptData, encryptData } from "@/lib";
 
 // Define TypeScript types for Country and State
 interface State {
@@ -71,11 +72,14 @@ export default function Participation() {
 
   const handleSubmit = async (values: FormValues) => {
     const existingData = localStorage.getItem("data");
-    const updatedData = existingData ? JSON.parse(existingData) : {};
+    const decrypt = await decryptData(existingData!);
+    const updatedData = existingData ? JSON.parse(decrypt) : {};
 
     const mergedData = { ...updatedData, ...values };
 
-    localStorage.setItem("data", JSON.stringify(mergedData));
+    // localStorage.setItem("data", JSON.stringify(mergedData));
+    const encryptValues = await encryptData(JSON.stringify(mergedData));
+    localStorage.setItem("data", encryptValues);
 
     router.replace("/form/education-career");
   };

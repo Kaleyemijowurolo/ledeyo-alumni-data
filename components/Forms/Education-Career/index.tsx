@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { decryptData, encryptData } from "@/lib";
 
 const formSchema = z.object({
   education: z.string().min(2, { message: "required" }),
@@ -86,19 +87,17 @@ export default function EducationCareer() {
   // };
 
   const handleSubmit = async (values: FormValues) => {
-    // Retrieve existing data from local storage
     const existingData = localStorage.getItem("data");
-    const updatedData = existingData ? JSON.parse(existingData) : {};
+    const decrypt = await decryptData(existingData!);
+    const updatedData = existingData ? JSON.parse(decrypt) : {};
 
-    // Merge existing data with new values
     const mergedData = { ...updatedData, ...values };
 
-    // Save the merged data back to local storage
-    localStorage.setItem("data", JSON.stringify(mergedData));
+    // localStorage.setItem("data", JSON.stringify(mergedData));
+    const encryptValues = await encryptData(JSON.stringify(mergedData));
+    localStorage.setItem("data", encryptValues);
 
     router.replace("/form/feedback");
-
-    // ... existing code ...
   };
 
   // Define an array of form fields
