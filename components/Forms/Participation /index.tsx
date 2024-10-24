@@ -152,6 +152,7 @@ export default function Participation() {
         "Health Practitioners",
         "Legal",
         "Youth in Ministry",
+        "Church Ministry",
         "Business & Finance",
         "Politics & Governance",
         "Construction & Engineering",
