@@ -1,102 +1,57 @@
 "use client";
-import React from "react";
-import // useState, ChangeEvent,
-// FormEvent,
-"react";
-
-// interface FormData {
-//   firstName: string;
-//   middleName?: string;
-//   surname: string;
-//   gender: string;
-//   phone: string;
-//   email: string;
-//   ledeyoSet: string;
-//   contactsAttended: number;
-//   commissioning: string;
-//   workshops: string[];
-//   nationality: string;
-//   country: string;
-//   state: string;
-//   city: string;
-//   education: string;
-//   discipline: string;
-//   occupation: string;
-//   crossCareer: string;
-//   crossCareerPath?: string;
-//   callMinistry: string;
-//   ministryCalling?: string;
-//   expectations?: string;
-//   suggestions?: string;
-// }
-
-// export default function Bio() {
-//   const [formData, setFormData] = useState<FormData>({
-//     firstName: "",
-//     surname: "",
-//     gender: "",
-//     phone: "",
-//     email: "",
-//     ledeyoSet: "",
-//     contactsAttended: 1,
-//     commissioning: "Yes",
-//     workshops: [],
-//     nationality: "",
-//     country: "",
-//     state: "",
-//     city: "",
-//     education: "",
-//     discipline: "",
-//     occupation: "",
-//     crossCareer: "No",
-//     callMinistry: "No",
-//   });
-
-//   const handleChange = (
-//     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-//   ) => {
-//     setFormData({ ...formData, [e.target.name]: e.target.value });
-//   };
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
-  FormControl,
-  // FormDescription,
-  FormField,
   FormItem,
   FormLabel,
+  FormField,
   FormMessage,
+  FormControl,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
+
+// Define TypeScript types for Country and State
+interface State {
+  name: string;
+}
+
+interface Country {
+  name: string;
+  states?: State[];
+}
 
 const formSchema = z.object({
-  ledeyoSet: z.string(),
-  workshops: z.string(),
-  nationality: z.string(),
-  city: z.string(),
-  commissioning: z.string(),
-  state: z.string(),
-  country: z.string(),
-  contactsAttended: z.string(),
+  ledeyoSet: z.string().min(2, { message: "required" }),
+  workshops: z.string().min(2, { message: "required." }),
+  nationality: z.string().min(2, { message: "required." }),
+  commissioning: z.string().min(2, { message: "required." }),
+  state: z.string().optional(), // Make state optional
+  country: z.string().min(1, { message: "required." }),
+  contactsAttended: z.string().min(1, { message: "required" }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function Participation() {
   const router = useRouter();
+
+  const st =
+    typeof window !== "undefined" ? sessionStorage.getItem("countries") : "";
+  const storedCountries = JSON.parse(st!);
+  const [countries] = useState<Country[]>(storedCountries || []); // Use Country type
+  const [states, setStates] = useState<State[]>([]); // Use State type
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       ledeyoSet: "",
       workshops: "",
       nationality: "",
-      city: "",
       commissioning: "",
       state: "",
       contactsAttended: "",
@@ -104,38 +59,22 @@ export default function Participation() {
     },
   });
 
-  // const handleSubmit = async (values: FormValues) => {
-  // try {
-  //   const response = await fetch("/api/submit", {
-  //     method: "PATCH",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(values),
-  //   });
+  // Handle country selection and update state options
+  const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCountry = countries.find(
+      (country: Country) => country.name === event.target.value
+    );
 
-  //   if (response.ok) {
-  //     alert("Form submitted successfully!");
-  //     console.log(response);
-  //     router.replace("/form/education-career");
-  //   } else {
-  //     alert("Form submission failed.");
-  //   }
-  // } catch (error) {
-  //   console.log(error);
-  //   alert("An error occurred");
-  // }
-  // };
+    setStates(selectedCountry?.states || []); // Set states or an empty array if none
+    form.setValue("country", event.target.value); // Set the country in the form
+  };
 
   const handleSubmit = async (values: FormValues) => {
-    // Retrieve existing data from local storage
     const existingData = localStorage.getItem("data");
     const updatedData = existingData ? JSON.parse(existingData) : {};
 
-    // Merge existing data with new values
     const mergedData = { ...updatedData, ...values };
 
-    // Save the merged data back to local storage
     localStorage.setItem("data", JSON.stringify(mergedData));
 
     router.replace("/form/education-career");
@@ -149,10 +88,9 @@ export default function Participation() {
     | "nationality"
     | "country"
     | "state"
-    | "city"
     | "contactsAttended";
 
-  // Update the formFields array to use the new type
+  // Updated formFields array
   const formFields: {
     name: FormFieldNames;
     label: string;
@@ -195,30 +133,27 @@ export default function Participation() {
       name: "nationality",
       label: "Nationality",
       type: "select",
-      options: ["Nigerian", "Foreigner"],
+      options: countries.map((country: Country) => country.name),
     },
     {
       name: "country",
       label: "Country of Residence",
       placeholder: "Enter your Country",
       type: "select",
-      options: ["Nigeria", "International"],
+      options: countries.map((country: Country) => country.name),
     },
-    {
-      name: "state",
-      label: "State/Province of Residence",
-      type: "select",
-      options: ["state", "state"],
-    },
-    {
-      name: "city",
-      label: "City of Residence",
-      type: "select",
-      options: ["city", "city"],
-    },
+    // Conditionally render the state field if states are available
+    ...(states.length > 0
+      ? [
+          {
+            name: "state" as FormFieldNames,
+            label: "State/Province of Residence",
+            type: "select",
+            options: states.map((state: State) => state.name),
+          },
+        ]
+      : []),
   ];
-
-  // ... existing code ...
 
   return (
     <div>
@@ -238,6 +173,11 @@ export default function Participation() {
                         <div>
                           <select
                             {...formField}
+                            onChange={
+                              field.name === "country"
+                                ? handleCountryChange // Only handle country change
+                                : formField.onChange
+                            }
                             className="border w-full rounded-md py-2 text-xs md:text-sm"
                           >
                             <option value="">Select </option>
@@ -256,9 +196,7 @@ export default function Participation() {
                         />
                       )}
                     </FormControl>
-                    {/* <FormDescription>
-                    This is your public display name.
-                  </FormDescription> */}
+
                     <FormMessage />
                   </FormItem>
                 )}

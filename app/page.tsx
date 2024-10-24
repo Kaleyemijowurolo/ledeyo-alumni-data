@@ -1,7 +1,26 @@
+"use client";
+import { getCountries } from "@/lib/thirdpartyApi";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
+
+async function fetchCountries() {
+  try {
+    const countries = await getCountries();
+    sessionStorage.setItem("countries", JSON.stringify(countries?.data));
+    return countries?.data;
+  } catch (error) {
+    console.error("Error fetching countries:", error);
+  }
+}
 
 export default function Home() {
+  useEffect(() => {
+    fetchCountries();
+    localStorage.remove("data");
+    return () => {};
+  }, []);
+
   return (
     <div
       style={{

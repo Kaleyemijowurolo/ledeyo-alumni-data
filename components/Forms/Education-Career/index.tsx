@@ -18,11 +18,11 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  education: z.string(),
-  discipline: z.string(),
-  occupation: z.string(),
-  crossCareerPath: z.string(),
-  callMinistry: z.string(),
+  education: z.string().min(2, { message: "required" }),
+  discipline: z.string().min(2, { message: "required" }),
+  occupation: z.string().min(2, { message: "required" }),
+  crossCareerPath: z.string().min(2, { message: "required" }),
+  callMinistry: z.string().min(2, { message: "required" }),
   ministryCalling: z.string().optional(),
 });
 

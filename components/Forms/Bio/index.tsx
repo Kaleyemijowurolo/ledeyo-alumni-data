@@ -18,10 +18,10 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  firstName: z.string(),
+  firstName: z.string().min(2, { message: "required" }),
   middleName: z.string().optional(),
-  surname: z.string(),
-  gender: z.string(),
+  surname: z.string().min(2, { message: "required" }),
+  gender: z.string().min(2, { message: "required" }),
   phone: z.string().min(11, {
     message: "phone must be at least 11 digits.",
   }),
