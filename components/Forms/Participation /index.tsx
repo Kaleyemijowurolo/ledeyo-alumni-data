@@ -14,6 +14,12 @@ import {
   FormMessage,
   FormControl,
 } from "@/components/ui/form";
+import {
+  decryptData,
+  encryptData,
+  encryptionKey,
+  encryptionKeyIV,
+} from "@/lib";
 
 // Define TypeScript types for Country and State
 interface State {
@@ -32,6 +38,7 @@ const formSchema = z.object({
   commissioning: z.string().min(2, { message: "required." }),
   state: z.string().optional(), // Make state optional
   country: z.string().min(1, { message: "required." }),
+  city: z.string().min(1, { message: "required." }),
   contactsAttended: z.string().min(1, { message: "required" }),
 });
 
@@ -40,9 +47,25 @@ type FormValues = z.infer<typeof formSchema>;
 export default function Participation() {
   const router = useRouter();
 
-  const st =
+  // const st =
+  //   typeof window !== "undefined" ? sessionStorage.getItem("countries") : "";
+  // const storedCountries = JSON.parse(st);
+  const storedCountriesString =
     typeof window !== "undefined" ? sessionStorage.getItem("countries") : "";
-  const storedCountries = JSON.parse(st!);
+  let storedCountries: Country[] = [];
+
+  // Check if the stored countries string is not empty
+  if (storedCountriesString) {
+    try {
+      // Attempt to parse the JSON
+      storedCountries = JSON.parse(storedCountriesString);
+    } catch (error) {
+      console.error("Error parsing countries:", error);
+      storedCountries = []; // Fallback to an empty array
+    }
+  } else {
+    console.warn("No countries found in sessionStorage.");
+  }
   const [countries] = useState<Country[]>(storedCountries || []); // Use Country type
   const [states, setStates] = useState<State[]>([]); // Use State type
 
@@ -54,6 +77,7 @@ export default function Participation() {
       nationality: "",
       commissioning: "",
       state: "",
+      city: "",
       contactsAttended: "",
       country: "",
     },
@@ -69,15 +93,35 @@ export default function Participation() {
     form.setValue("country", event.target.value); // Set the country in the form
   };
 
+  // Handle form submission
   const handleSubmit = async (values: FormValues) => {
+    // Retrieve existing data from localStorage
     const existingData = localStorage.getItem("data");
-    const updatedData = existingData ? JSON.parse(existingData) : {};
+    if (existingData) {
+      // Decrypt the existing data
+      const decrypt = await decryptData(
+        existingData,
+        encryptionKey,
+        encryptionKeyIV
+      );
+      console.log(decrypt, "decrypt in participation");
+      // Parse the decrypted data or use an empty object if decryption fails
+      const updatedData = decrypt ? JSON.parse(decrypt) : {};
+      // Merge the existing data with the new form values
+      const mergedData = { ...updatedData, ...values };
 
-    const mergedData = { ...updatedData, ...values };
-
-    localStorage.setItem("data", JSON.stringify(mergedData));
-
-    router.replace("/form/education-career");
+      // Convert merged data to a string and encrypt it
+      const encryptValuesString = JSON.stringify(mergedData);
+      const encryptValues = await encryptData(
+        encryptValuesString,
+        encryptionKey,
+        encryptionKeyIV
+      );
+      // Store the encrypted data back in localStorage
+      localStorage.setItem("data", encryptValues);
+      // Redirect to the next form
+      router.replace("/form/education-career");
+    }
   };
 
   // Define a type for the form field names
@@ -88,6 +132,7 @@ export default function Participation() {
     | "nationality"
     | "country"
     | "state"
+    | "city"
     | "contactsAttended";
 
   // Updated formFields array
@@ -99,23 +144,23 @@ export default function Participation() {
     placeholder?: string;
   }[] = [
     {
+      type: "select",
       name: "ledeyoSet",
       label: "Which LEDEYO Set do you belong to",
-      type: "select",
       options: ["Set 1", "Set 2", "Set 3", "Set 4", "Set 5"],
     },
     {
+      type: "select",
+      options: [1, 2],
       name: "contactsAttended",
       label: "How many LEDEYO contacts did you attend?",
       placeholder: "Enter number of Contacts Attended",
-      type: "select",
-      options: [1, 2],
     },
     {
-      name: "commissioning",
-      label: "Did you attend the Commissioning?",
       type: "select",
+      name: "commissioning",
       options: ["Yes", "No"],
+      label: "Did you attend the Commissioning?",
     },
     {
       name: "workshops",
@@ -126,22 +171,26 @@ export default function Participation() {
         "Health Practitioners",
         "Legal",
         "Youth in Ministry",
+        "Church Ministry",
         "Business & Finance",
+        "Politics & Governance",
+        "Construction & Engineering",
       ],
     },
     {
+      type: "select",
       name: "nationality",
       label: "Nationality",
-      type: "select",
       options: countries.map((country: Country) => country.name),
     },
     {
       name: "country",
+      type: "select",
       label: "Country of Residence",
       placeholder: "Enter your Country",
-      type: "select",
       options: countries.map((country: Country) => country.name),
     },
+
     // Conditionally render the state field if states are available
     ...(states.length > 0
       ? [
@@ -153,6 +202,12 @@ export default function Participation() {
           },
         ]
       : []),
+    {
+      name: "city",
+      type: "text",
+      label: "City/Town of Residence",
+      placeholder: "Enter your city",
+    },
   ];
 
   return (

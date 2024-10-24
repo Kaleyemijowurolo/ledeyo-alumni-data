@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { encryptData, encryptionKey, encryptionKeyIV } from "@/lib";
 
 const formSchema = z.object({
   firstName: z.string().min(2, { message: "required" }),
@@ -46,29 +47,17 @@ export default function Bio() {
   });
 
   const handleSubmit = async (values: FormValues) => {
-    localStorage.setItem("data", JSON.stringify(values));
+    // Encrypt the form values and store them in local storage
+    const encryptValuesString = JSON.stringify(values);
+    const encryptValues = encryptData(
+      encryptValuesString,
+      encryptionKey,
+      encryptionKeyIV
+    );
+    localStorage.setItem("data", encryptValues);
+    // Redirect to the participation page
     router.replace("/form/participation");
-
-    // try {
-    //   const response = await fetch("/api/submit", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(values),
-    //   });
-
-    //   if (response.ok) {
-    //     alert("Form submitted successfully!");
-    //     console.log(response);
-    //     router.replace("/form/participation");
-    //   } else {
-    //     alert("Form submission failed.");
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   alert("An error occurred");
-    // }
+    // ... existing code ...
   };
   // Define an array of form fields
   const formFields: {

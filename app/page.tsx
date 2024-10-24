@@ -16,9 +16,8 @@ async function fetchCountries() {
 
 export default function Home() {
   useEffect(() => {
-    fetchCountries();
-
     if (typeof window !== "undefined") {
+      fetchCountries();
       localStorage.removeItem("data");
     }
     return () => {};

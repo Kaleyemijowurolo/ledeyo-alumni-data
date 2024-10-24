@@ -1,4 +1,5 @@
 "use client";
+import { decryptData, encryptionKey, encryptionKeyIV } from "@/lib";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"; // Import useEffect and useState
 // import { toast } from "sonner";
@@ -31,7 +32,11 @@ export default function FeedbackPage() {
   useEffect(() => {
     // handleSubmit();
     const formData = localStorage.getItem("data"); // Get firstName from localStorage
-    const dataObj = JSON.parse(formData!);
+    if (!formData) return;
+    const decrypt = decryptData(formData, encryptionKey, encryptionKeyIV);
+
+    // Decrypt the existing data
+    const dataObj = JSON.parse(decrypt!);
     if (formData) {
       setFirstName(dataObj?.firstName); // Set firstName state if it exists
     }
