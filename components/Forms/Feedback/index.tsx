@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,10 +14,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+// import { Input, TextArea } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { decryptData, encryptionKey, encryptionKeyIV } from "@/lib";
+import {
+  decryptData,
+  encryptData,
+  encryptionKey,
+  encryptionKeyIV,
+} from "@/lib";
 
 const formSchema = z.object({
   expectations: z.string(),
@@ -37,32 +42,26 @@ export default function Feedback() {
     },
   });
 
-  // const onSubmit = () => {
-  //   router.replace("/form/thankyou");
-  // };
-
-  // const handleSubmit = async (values: FormValues) => {
-  //   try {
-  //     const response = await fetch("/api/submit", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(values),
-  //     });
-
-  //     if (response.ok) {
-  //       alert("Form submitted successfully!");
-  //       console.log(response);
-  //       router.replace("/form/thankyou");
-  //     } else {
-  //       alert("Form submission failed.");
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     alert("An error occurred");
-  //   }
-  // };
+  // Load initial values from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const encryptedData = localStorage.getItem("data");
+      if (encryptedData) {
+        try {
+          const decryptedDataString = decryptData(
+            encryptedData,
+            encryptionKey,
+            encryptionKeyIV
+          );
+          const decryptedData = JSON.parse(decryptedDataString);
+          console.log("decryptedData", decryptedData);
+          form.reset(decryptedData); // Set the decrypted data as form's initial values
+        } catch (error) {
+          console.error("Error decrypting data:", error);
+        }
+      }
+    }
+  }, []);
 
   const handleSubmit = async (values: FormValues) => {
     setIsLoading(true);
@@ -100,7 +99,7 @@ export default function Feedback() {
 
         // toast.success("Form submitted successfully!");
         console.log(response);
-        router.replace("/form/thankyou");
+        router.push("/form/thankyou");
         setIsLoading(true);
       } else {
         const errorData = await response.json(); // Extract error data
@@ -137,8 +136,28 @@ export default function Feedback() {
     },
   ];
 
-  // ... existing code ...
+  const handlePrevious = async () => {
+    const existingData = localStorage.getItem("data");
 
+    if (existingData) {
+      const decrypt = await decryptData(
+        existingData,
+        encryptionKey,
+        encryptionKeyIV
+      );
+      const updatedData = decrypt ? JSON.parse(decrypt) : {};
+      const mergedData = { ...updatedData, ...form.getValues() };
+
+      const encryptValuesString = JSON.stringify(mergedData);
+      const encryptValues = await encryptData(
+        encryptValuesString,
+        encryptionKey,
+        encryptionKeyIV
+      );
+      localStorage.setItem("data", encryptValues);
+      router.push("/form/education-career");
+    }
+  };
   return (
     <div>
       <Form {...form}>
@@ -153,10 +172,11 @@ export default function Feedback() {
                   <FormItem>
                     <FormLabel className="text-base">{field.label}</FormLabel>
                     <FormControl>
-                      <Input
+                      <textarea
+                        className="w-full border text-sm placeholder:text-sm h-28 p-2 rounded-lg"
                         placeholder={field.placeholder}
                         {...formField}
-                        type={field.type || "text"}
+                        // type={field.type || "text"}
                       />
                     </FormControl>
 
@@ -166,7 +186,15 @@ export default function Feedback() {
               />
             ))}
           </div>
-          <div className="float-right my-3 border ">
+          <div className="float-right my-3 flex gap-x-4 mt-6">
+            <Button
+              onClick={handlePrevious}
+              className="bg-transparent border text-black hover:bg-transparent hover:opacity-70"
+              disabled={isLoading}
+              type="button"
+            >
+              Previous
+            </Button>
             <Button disabled={isLoading} type="submit">
               {isLoading ? "Submiting..." : "Finish"}
             </Button>

@@ -18,7 +18,7 @@ export default function LayoutController({
     if (pathname === "/form/thankyou") {
       const handlePopState = (event: PopStateEvent) => {
         event.preventDefault(); // Prevent the default browser back behavior
-        router.replace("/"); // Navigate the user to the homepage
+        router.push("/"); // Navigate the user to the homepage
       };
 
       // Add the event listener

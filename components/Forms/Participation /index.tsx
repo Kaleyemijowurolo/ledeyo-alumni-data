@@ -1,6 +1,6 @@
 "use client";
 import { z } from "zod";
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ const formSchema = z.object({
   workshops: z.string().min(2, { message: "required." }),
   nationality: z.string().min(2, { message: "required." }),
   commissioning: z.string().min(2, { message: "required." }),
-  state: z.string().optional(), // Make state optional
+  state: z.string().optional(),
   country: z.string().min(1, { message: "required." }),
   city: z.string().min(1, { message: "required." }),
   contactsAttended: z.string().min(1, { message: "required" }),
@@ -47,27 +47,8 @@ type FormValues = z.infer<typeof formSchema>;
 export default function Participation() {
   const router = useRouter();
 
-  // const st =
-  //   typeof window !== "undefined" ? sessionStorage.getItem("countries") : "";
-  // const storedCountries = JSON.parse(st);
-  const storedCountriesString =
-    typeof window !== "undefined" ? sessionStorage.getItem("countries") : "";
-  let storedCountries: Country[] = [];
-
-  // Check if the stored countries string is not empty
-  if (storedCountriesString) {
-    try {
-      // Attempt to parse the JSON
-      storedCountries = JSON.parse(storedCountriesString);
-    } catch (error) {
-      console.error("Error parsing countries:", error);
-      storedCountries = []; // Fallback to an empty array
-    }
-  } else {
-    console.warn("No countries found in sessionStorage.");
-  }
-  const [countries] = useState<Country[]>(storedCountries || []); // Use Country type
-  const [states, setStates] = useState<State[]>([]); // Use State type
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [states, setStates] = useState<State[]>([]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -82,62 +63,76 @@ export default function Participation() {
       country: "",
     },
   });
+  // Load countries and initial form data from storage
+  useLayoutEffect(() => {
+    const storedCountriesString = sessionStorage.getItem("countries");
+    if (storedCountriesString) {
+      try {
+        const parsedCountries = JSON.parse(storedCountriesString);
+        setCountries(parsedCountries);
+      } catch (error) {
+        console.error("Error parsing countries:", error);
+      }
+    } else {
+      console.warn("No countries found in sessionStorage.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const encryptedData = localStorage.getItem("data");
+      if (encryptedData) {
+        try {
+          const decryptedDataString = decryptData(
+            encryptedData,
+            encryptionKey,
+            encryptionKeyIV
+          );
+          const decryptedData = JSON.parse(decryptedDataString);
+          console.log("decryptedData", decryptedData);
+          form.reset(decryptedData); // Set the decrypted data as form's initial values
+        } catch (error) {
+          console.error("Error decrypting data:", error);
+        }
+      }
+    }
+  }, []);
 
   // Handle country selection and update state options
   const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCountry = countries.find(
-      (country: Country) => country.name === event.target.value
+      (country) => country.name === event.target.value
     );
-
-    setStates(selectedCountry?.states || []); // Set states or an empty array if none
-    form.setValue("country", event.target.value); // Set the country in the form
+    setStates(selectedCountry?.states || []);
+    form.setValue("country", event.target.value);
   };
 
   // Handle form submission
   const handleSubmit = async (values: FormValues) => {
-    // Retrieve existing data from localStorage
     const existingData = localStorage.getItem("data");
     if (existingData) {
-      // Decrypt the existing data
       const decrypt = await decryptData(
         existingData,
         encryptionKey,
         encryptionKeyIV
       );
-      console.log(decrypt, "decrypt in participation");
-      // Parse the decrypted data or use an empty object if decryption fails
       const updatedData = decrypt ? JSON.parse(decrypt) : {};
-      // Merge the existing data with the new form values
       const mergedData = { ...updatedData, ...values };
 
-      // Convert merged data to a string and encrypt it
       const encryptValuesString = JSON.stringify(mergedData);
       const encryptValues = await encryptData(
         encryptValuesString,
         encryptionKey,
         encryptionKeyIV
       );
-      // Store the encrypted data back in localStorage
       localStorage.setItem("data", encryptValues);
-      // Redirect to the next form
-      router.replace("/form/education-career");
+      router.push("/form/education-career");
     }
   };
 
-  // Define a type for the form field names
-  type FormFieldNames =
-    | "ledeyoSet"
-    | "commissioning"
-    | "workshops"
-    | "nationality"
-    | "country"
-    | "state"
-    | "city"
-    | "contactsAttended";
-
-  // Updated formFields array
+  // Define form fields
   const formFields: {
-    name: FormFieldNames;
+    name: keyof FormValues;
     label: string;
     type: string;
     options?: string[] | number[];
@@ -181,24 +176,22 @@ export default function Participation() {
       type: "select",
       name: "nationality",
       label: "Nationality",
-      options: countries.map((country: Country) => country.name),
+      options: countries.map((country) => country.name),
     },
     {
       name: "country",
       type: "select",
       label: "Country of Residence",
       placeholder: "Enter your Country",
-      options: countries.map((country: Country) => country.name),
+      options: countries.map((country) => country.name),
     },
-
-    // Conditionally render the state field if states are available
     ...(states.length > 0
       ? [
           {
-            name: "state" as FormFieldNames,
+            name: "state" as keyof FormValues,
             label: "State/Province of Residence",
             type: "select",
-            options: states.map((state: State) => state.name),
+            options: states.map((state) => state.name),
           },
         ]
       : []),
@@ -210,6 +203,9 @@ export default function Participation() {
     },
   ];
 
+  const handlePrevious = async () => {
+    router.push("/form/bio");
+  };
   return (
     <div>
       <Form {...form}>
@@ -230,12 +226,12 @@ export default function Participation() {
                             {...formField}
                             onChange={
                               field.name === "country"
-                                ? handleCountryChange // Only handle country change
+                                ? handleCountryChange
                                 : formField.onChange
                             }
                             className="border w-full rounded-md py-2 text-xs md:text-sm"
                           >
-                            <option value="">Select </option>
+                            <option value="">Select</option>
                             {field?.options?.map((option) => (
                               <option key={option} value={option}>
                                 {option}
@@ -251,15 +247,21 @@ export default function Participation() {
                         />
                       )}
                     </FormControl>
-
                     <FormMessage />
                   </FormItem>
                 )}
               />
             ))}
           </div>
-          <div className="float-right my-3 border">
-            <Button type="submit">Next</Button>
+          <div className="float-right my-3 flex gap-x-4 mt-6">
+            <Button
+              onClick={handlePrevious}
+              className="bg-transparent border text-black hover:bg-transparent hover:opacity-70"
+              type="button"
+            >
+              Previous
+            </Button>
+            <Button type="submit">{"Next"}</Button>
           </div>
         </form>
       </Form>

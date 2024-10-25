@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  // FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,7 +15,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { encryptData, encryptionKey, encryptionKeyIV } from "@/lib";
+import {
+  decryptData,
+  encryptData,
+  encryptionKey,
+  encryptionKeyIV,
+} from "@/lib";
 
 const formSchema = z.object({
   firstName: z.string().min(2, { message: "required" }),
@@ -46,20 +50,58 @@ export default function Bio() {
     },
   });
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const encryptedData = localStorage.getItem("data");
+      if (encryptedData) {
+        try {
+          const decryptedDataString = decryptData(
+            encryptedData,
+            encryptionKey,
+            encryptionKeyIV
+          );
+          const decryptedData = JSON.parse(decryptedDataString);
+          console.log("decryptedData", decryptedData);
+          form.reset(decryptedData); // Set the decrypted data as form's initial values
+        } catch (error) {
+          console.error("Error decrypting data:", error);
+        }
+      }
+    }
+  }, []);
+
   const handleSubmit = async (values: FormValues) => {
-    // Encrypt the form values and store them in local storage
-    const encryptValuesString = JSON.stringify(values);
-    const encryptValues = encryptData(
-      encryptValuesString,
-      encryptionKey,
-      encryptionKeyIV
-    );
-    localStorage.setItem("data", encryptValues);
-    // Redirect to the participation page
-    router.replace("/form/participation");
-    // ... existing code ...
+    const existingData = localStorage.getItem("data");
+    if (existingData) {
+      const decrypt = await decryptData(
+        existingData,
+        encryptionKey,
+        encryptionKeyIV
+      );
+
+      const updatedData = decrypt ? JSON.parse(decrypt) : {};
+      const mergedData = { ...updatedData, ...values };
+
+      const encryptValuesString = JSON.stringify(mergedData);
+      const encryptValues = encryptData(
+        encryptValuesString,
+        encryptionKey,
+        encryptionKeyIV
+      );
+      localStorage.setItem("data", encryptValues);
+      router.push("/form/participation");
+    } else {
+      const encryptValuesString = JSON.stringify(values);
+      const encryptValues = encryptData(
+        encryptValuesString,
+        encryptionKey,
+        encryptionKeyIV
+      );
+      localStorage.setItem("data", encryptValues);
+      router.push("/form/participation");
+    }
   };
-  // Define an array of form fields
+
   const formFields: {
     name: "firstName" | "middleName" | "surname" | "gender" | "phone" | "email";
     label: string;
@@ -72,7 +114,6 @@ export default function Bio() {
       label: "First Name",
       placeholder: "Enter your first name",
     },
-
     {
       name: "middleName",
       label: "Middle Name",
@@ -98,6 +139,10 @@ export default function Bio() {
       type: "email",
     },
   ];
+
+  const handlePrevious = async () => {
+    router.push("/");
+  };
 
   return (
     <div>
@@ -142,8 +187,15 @@ export default function Bio() {
               />
             ))}
           </div>
-          <div className="float-right my-3 border">
-            <Button type="submit">Next</Button>
+          <div className="float-right my-3 flex gap-x-4 mt-6">
+            <Button
+              onClick={handlePrevious}
+              className="bg-transparent border text-black hover:bg-transparent hover:opacity-70"
+              type="button"
+            >
+              Back
+            </Button>
+            <Button type="submit">{"Next"}</Button>
           </div>
         </form>
       </Form>
