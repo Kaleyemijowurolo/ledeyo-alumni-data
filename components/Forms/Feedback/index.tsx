@@ -94,14 +94,15 @@ export default function Feedback() {
         const responseData = await response.json(); // Extract response data
         toast.success(responseData.message || "Form submitted successfully!"); // Use the message from the response
 
-        // Set the flag in cookies for the middleware to track
-        document.cookie = "visitedThankYouPage=true; path=/";
+        // // Set the flag in cookies for the middleware to track
+        // document.cookie = "visitedThankYouPage=true; path=/";
 
         // toast.success("Form submitted successfully!");
         console.log(response);
         router.push("/form/thankyou");
-        setIsLoading(true);
+        setIsLoading(false);
       } else {
+        setIsLoading(false);
         const errorData = await response.json(); // Extract error data
         toast.error(errorData.message || "Form submission failed."); // Use the error message from the response
         console.log(response);

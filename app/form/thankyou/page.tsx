@@ -31,6 +31,11 @@ export default function FeedbackPage() {
   // };
 
   useEffect(() => {
+    // Replace the current route in history with `/thankyou`
+    router.replace("/form/thankyou");
+  }, [router]);
+
+  useEffect(() => {
     // handleSubmit();
     const formData = localStorage.getItem("data"); // Get firstName from localStorage
     if (!formData) return;
