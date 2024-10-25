@@ -140,8 +140,29 @@ export default function Bio() {
     },
   ];
 
+  // const handlePrevious = async () => {
+  //   const confirmLeave = window.confirm(
+  //     "Are you sure you want to go back? Your data will be lost."
+  //   );
+  //   if (confirmLeave) {
+  //     router.push("/");
+  //   }
+  // };
+
   const handlePrevious = async () => {
-    router.push("/");
+    const hasData = Object.values(form.getValues()).some(
+      (value) => value !== ""
+    );
+    if (hasData) {
+      const confirmLeave = window.confirm(
+        "Are you sure you want to go back? Your data will be lost."
+      );
+      if (confirmLeave) {
+        router.push("/");
+      }
+    } else {
+      router.push("/"); // Route directly if no data is entered
+    }
   };
 
   return (
