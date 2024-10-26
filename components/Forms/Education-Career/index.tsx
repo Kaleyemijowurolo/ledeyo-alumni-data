@@ -390,6 +390,8 @@ export default function EducationCareer() {
         "High School Diploma",
         "Vocational/Technical Certificate",
         "Associate's Degree (Diploma)",
+        "National Diploma",
+        "Higher National Diploma",
         "Bachelor's Degree",
         "Master's Degree",
         "Doctorate (PhD or equivalent)",

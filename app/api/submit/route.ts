@@ -52,3 +52,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error }, { status: 400 });
   }
 }
+
+// import crypto from "crypto";
+// const secret = crypto.randomBytes(32).toString("hex");
+// console.log(secret, "JWT secret");

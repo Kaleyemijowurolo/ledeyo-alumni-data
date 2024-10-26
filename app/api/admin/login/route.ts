@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import AlumniAdmin from "@/models/AlumniAdmin";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { generateToken } from "@/lib/jwt";
 
 // POST request for admin login
 export async function POST(request: Request) {
@@ -31,11 +31,7 @@ export async function POST(request: Request) {
     }
 
     // Generate a JWT token
-    const token = jwt.sign(
-      { email: admin.email },
-      process.env.JWT_SECRET || "your_jwt_secret",
-      { expiresIn: "1h" }
-    );
+    const token = generateToken(admin.email);
 
     // Return a successful response with admin info (without the password)
     return NextResponse.json(
