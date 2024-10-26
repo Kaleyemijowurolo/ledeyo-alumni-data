@@ -1,31 +1,5 @@
-import mongoose, { Document, Schema, model } from "mongoose";
-
-export interface IAlumni extends Document {
-  firstName?: string;
-  middleName?: string;
-  surname?: string;
-  gender?: string;
-  phone?: string;
-  email?: string;
-  ledeyoSet?: string;
-  contactsAttended?: string;
-  commissioning?: string;
-  workshops?: string;
-  //   workshops: string[];
-  nationality?: string;
-  country?: string;
-  state?: string;
-  city?: string;
-  education?: string;
-  discipline?: string;
-  occupation?: string;
-  crossCareer?: boolean;
-  crossCareerPath?: string;
-  callMinistry?: boolean;
-  ministryCalling?: string;
-  expectations?: string;
-  suggestions?: string;
-}
+import { IAlumni } from "@/types/Alumni";
+import mongoose, { Schema, model } from "mongoose";
 
 const AlumniSchema: Schema = new Schema({
   firstName: { type: String },
