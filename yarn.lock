@@ -3050,6 +3050,11 @@ use-latest@^1.2.1:
   dependencies:
     use-isomorphic-layout-effect "^1.1.1"
 
+user-agent-parser@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/user-agent-parser/-/user-agent-parser-0.6.0.tgz#00dd819143ca12240f23e91fcdc8b31f3b6e92a2"
+  integrity sha512-0vnusubvsNE8gwQTFNHcxfUgcQTl4h1/hR2gvKFzWgWqhMnD0f+5y0yJZkP1fwG4QFuYEUf7W+3rvotJuRzYvA==
+
 util-deprecate@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
