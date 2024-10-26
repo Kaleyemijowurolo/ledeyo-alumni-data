@@ -37,7 +37,8 @@ export async function GET() {
         headers: {
           "Access-Control-Allow-Origin": "*", // Replace "*" with a specific origin if necessary
           "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
-          "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          "Access-Control-Allow-Headers": "Content-Type", //without Authorization
+          // "Access-Control-Allow-Headers": "Content-Type, Authorization",
         },
       }
     );
