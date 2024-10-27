@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       {
         success: true,
         message: "Login successful!",
-        data: { ...alumniInfo, email: admin.email, token }, // Use alumniInfo here
+        data: { alumniInfo, email: admin.email, token }, // Use alumniInfo here
       },
       { status: 200 }
     );
