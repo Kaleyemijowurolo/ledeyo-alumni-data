@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import AlumniAdmin from "@/models/AlumniAdmin";
+import Alumni from "@/models/Alumni";
 import bcrypt from "bcryptjs";
 import { generateToken } from "@/lib/jwt";
 
@@ -33,12 +34,18 @@ export async function POST(request: Request) {
     // Generate a JWT token
     const token = generateToken(admin.email);
 
+    // if the alumni admin exist in admin database, get his user from the alumni list
+    const alumniData = await Alumni.find({ email });
+
+    // Handle case where alumni data is not found
+    const alumniInfo = alumniData.length > 0 ? alumniData : {}; // Ensure alumniInfo is an array
+
     // Return a successful response with admin info (without the password)
     return NextResponse.json(
       {
         success: true,
         message: "Login successful!",
-        data: { email: admin.email, token },
+        data: { alumniInfo, email: admin.email, token }, // Use alumniInfo here
       },
       { status: 200 }
     );
