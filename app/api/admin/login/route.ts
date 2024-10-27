@@ -38,14 +38,14 @@ export async function POST(request: Request) {
     const alumniData = await Alumni.find({ email });
 
     // Handle case where alumni data is not found
-    const alumniInfo = alumniData.length > 0 ? alumniData : {}; // Ensure alumniInfo is an array
+    const alumniInfo = alumniData.length > 0 ? alumniData?.[0] : {}; // Ensure alumniInfo is an array
 
     // Return a successful response with admin info (without the password)
     return NextResponse.json(
       {
         success: true,
         message: "Login successful!",
-        data: { alumniInfo, email: admin.email, token }, // Use alumniInfo here
+        data: { ...alumniInfo, email: admin.email, token }, // Use alumniInfo here
       },
       { status: 200 }
     );
