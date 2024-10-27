@@ -95,8 +95,8 @@ export async function PUT(request: Request) {
   await dbConnect();
 
   try {
-    const { id, ...updates } = await request.json();
-    const alumni = await AlumniAdmin.findByIdAndUpdate(id, updates, {
+    const { _id, ...updates } = await request.json();
+    const alumni = await AlumniAdmin.findByIdAndUpdate(_id, updates, {
       new: true,
     });
 
